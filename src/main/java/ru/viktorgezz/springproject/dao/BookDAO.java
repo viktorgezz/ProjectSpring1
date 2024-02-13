@@ -8,6 +8,7 @@ import ru.viktorgezz.springproject.model.Book;
 import ru.viktorgezz.springproject.model.People;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class BookDAO {
@@ -53,8 +54,27 @@ public class BookDAO {
                 updateBook.getTitle(), updateBook.getAuthor(), updateBook.getDateCreation(), id);
     }
 
+    // Join'им таблицы Book и Person и получаем человека, которому принадлежит книга с указанным id
+    public Optional<People> getBookOwner(int id) {
+        // Выбираем все колонки таблицы Person из объединенной таблицы
+        return jdbcTemplate.query("SELECT People.* FROM Book JOIN People ON Book.people_id = People.people_id " +
+                        "WHERE Book.book_id = ?", new Object[]{id}, new BeanPropertyRowMapper<>(People.class))
+                .stream().findAny();
+    }
+
     public void assignStatus(int id, Integer statusId) {
         jdbcTemplate.update("UPDATE Book SET people_id=? WHERE book_id=?",
                 statusId, id);
     }
+
+    // Освбождает книгу (этот метод вызывается, когда человек возвращает книгу в библиотеку)
+    public void release(int id) {
+        jdbcTemplate.update("UPDATE Book SET people_id=NULL WHERE book_id=?", id);
+    }
+
+    // Назначает книгу человеку (этот метод вызывается, когда человек забирает книгу из библиотеки)
+    public void assign(int id, People selectedPerson) {
+        jdbcTemplate.update("UPDATE Book SET people_id=? WHERE book_id=?", selectedPerson.getId(), id);
+    }
+
 }

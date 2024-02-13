@@ -11,6 +11,7 @@ import ru.viktorgezz.springproject.model.Book;
 import ru.viktorgezz.springproject.model.People;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(produces = "text/plain;charset=UTF-8")
@@ -32,8 +33,7 @@ public class BookController {
     }
 
     @GetMapping("/books/new")
-    public String newBook(Model model) {
-        model.addAttribute("book", new Book());
+    public String newBook(@ModelAttribute("book") Book book) {
         return "/book/new";
     }
 
@@ -53,9 +53,27 @@ public class BookController {
                        Model model,
                        @ModelAttribute("people") People people) {
         model.addAttribute("book", bookDAO.show(id));
-        model.addAttribute("bookPeople", bookDAO.showPeople(id));
-        model.addAttribute("peoples", peopleDAO.index());
+
+        Optional<People> bookOwner = bookDAO.getBookOwner(id);
+
+        if (bookOwner.isPresent())
+            model.addAttribute("owner", bookOwner.get());
+        else
+            model.addAttribute("peoples", peopleDAO.index());
+
         return "/book/show";
+    }
+
+    @PatchMapping("/books/{id}/release")
+    public String release(@PathVariable("id") int id) {
+        bookDAO.release(id);
+        return "redirect:/books/" + id;
+    }
+
+    @PatchMapping("/books/{id}/assign")
+    public String assign(@PathVariable("id") int id, @ModelAttribute("person") People selectedPerson) {
+        bookDAO.assign(id, selectedPerson);
+        return "redirect:/books/" + id;
     }
 
     @PatchMapping("/books/add/people")

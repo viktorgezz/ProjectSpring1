@@ -18,13 +18,11 @@ public class PeopleController {
 
     private final PeopleDAO peopleDAO;
     private final BookDAO bookDAO;
-    private final PeopleValidator peopleValidator;
 
     @Autowired
     public PeopleController(PeopleDAO peopleDAO, BookDAO bookDAO, PeopleValidator peopleValidator) {
         this.peopleDAO = peopleDAO;
         this.bookDAO = bookDAO;
-        this.peopleValidator = peopleValidator;
     }
 
     @GetMapping("/peoples")
@@ -42,12 +40,9 @@ public class PeopleController {
     public String create(@ModelAttribute("people") @Valid People people,
                          BindingResult bindingResult) {
 //        peopleValidator.validate(person, bindingResult);
-        System.out.println(" " + people.getName() + " " + people.getDateBirth() + "!");
         if (bindingResult.hasErrors()) {
-            System.out.println(" " + people.getName() + " " + people.getDateBirth() + "!!");
             return "/people/new";
         }
-        System.out.println(" " + people.getName() + " " + people.getDateBirth() + "!!!");
 
         peopleDAO.save(people);
         return "redirect:/peoples";

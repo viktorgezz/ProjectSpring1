@@ -6,7 +6,6 @@ import javax.validation.constraints.Size;
 
 public class Book {
     private int id;
-    private int idAuthor;
 
     @NotEmpty(message = "Название книги не должно быть пустым")
     @Size(min = 2, max = 100, message = "Название книги должно быть от 2 до 100 символов длиной")
@@ -21,7 +20,6 @@ public class Book {
 
     public Book(int id, int idAuthor, String title, String author, int dateCreation) {
         this.id = id;
-        this.idAuthor = idAuthor;
         this.title = title;
         this.author = author;
         this.dateCreation = dateCreation;
@@ -36,14 +34,6 @@ public class Book {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getIdAuthor() {
-        return idAuthor;
-    }
-
-    public void setIdAuthor(int idAuthor) {
-        this.idAuthor = idAuthor;
     }
 
     public String getTitle() {
